@@ -20,6 +20,8 @@ public class ChatClient extends AbstractClient
   String s;                            //
   ArrayList<MapPlace> MapPlaces; 
   String LoginAnswer;
+    double Price;
+  boolean discount;
   
 //////////////////////////////////////////////////Constructor////////////////////////////////////
   
@@ -104,7 +106,19 @@ public ArrayList<String> getPlacesNames() {
 public void setPlacesNames(ArrayList<String> placesNames) {
 	PlacesNames = placesNames;
 }
+public double getPrice() {
+	return Price;
+}
 
+public void setPrice(String string,double d) {//d is 1 if no discount and 0.9 if there is a discount
+	Price = Double.parseDouble(string) * d;
+}
+public boolean isDiscount() {
+	return discount;
+}
+public void setDiscount(boolean discount) {
+	this.discount = discount;
+}
 
 
 //////////////////////////////////////////Returns from server!!!!!!!!/////////////////////////////////////////////////////
@@ -172,6 +186,18 @@ public void handleMessageFromServer(Object obj)
 				}
 				else if(((ArrayList<String>)obj).get(0).equals("LogFailed"))
 					setLoginAnswer("Failed");
+			}
+					else if(((ArrayList<String>)obj).get(0).equals("CityPrice"))
+			{
+			((ArrayList<String>)obj).remove(0);
+			if(((ArrayList<String>)obj).get(1).equals("discountYes")) {
+	        setPrice(((ArrayList<String>)obj).get(0),0.9);
+	        setDiscount(true);
+			}
+			else {
+				setPrice(((ArrayList<String>)obj).get(0),1);
+				setDiscount(false);
+				}
 			}
 
 		}
