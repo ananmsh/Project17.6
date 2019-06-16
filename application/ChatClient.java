@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import entities.Customer;
+import entities.MapPlace;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -17,8 +18,35 @@ public class ChatClient extends AbstractClient
   ArrayList<String> MapsNames;
   Image image;
   String s;                            //
-  ArrayList<MapPlace> MapPlaces;   
-String LoginAnswer;
+  ArrayList<MapPlace> MapPlaces; 
+  String LoginAnswer;
+  
+//////////////////////////////////////////////////Constructor////////////////////////////////////
+  
+  public ChatClient(String host, int port, ChatIF clientUI)  throws IOException 
+  {
+    super(host, port); //Call the superclass constructor
+    this.clientUI = clientUI;
+    openConnection();
+    PlacesNames=new ArrayList<String>();
+    cityNames=new ArrayList<String>();
+    cityReport=new ArrayList<String>();
+    MapsNames=new ArrayList<String>();
+    image=null;
+    s= new String();                                    //
+    MapPlaces=new ArrayList<MapPlace>();  
+    LoginAnswer= new String();
+  }
+  
+/////////////////////////////////////////////////getters&setters//////////////////////////////////  
+
+  public ArrayList<MapPlace> getMapPlaces() {
+	return MapPlaces;
+}
+
+public void setMapPlaces(ArrayList<MapPlace> mapPlaces) {
+	MapPlaces = mapPlaces;
+}
   
 public String getLoginAnswer() {
 	return LoginAnswer;
@@ -27,20 +55,15 @@ public String getLoginAnswer() {
 public void setLoginAnswer(String loginAnswer) {
 	LoginAnswer = loginAnswer;
 }
-/////////////////////////////////////////////////getters&setters//////////////////////////////////  
-public String getS() {
+  
+  public String getS() {
 	return s;
 }
 
 public void setS(String s) {
 	this.s = s;
 }
-public void setLoginAnswer(boolean Answer) {
-	this.LoginAnswer = Answer;
-	}
-public boolean getLoginAnswer() {
-	return LoginAnswer;
-}
+
 
 public Image getImage() {
 	return image;
@@ -74,29 +97,17 @@ public void setCityReport(ArrayList<String> cityReport) {
 	this.cityReport = cityReport;
 }
 
-public ChatClient(String host, int port, ChatIF clientUI)  throws IOException 
-  {
-    super(host, port); //Call the superclass constructor
-    this.clientUI = clientUI;
-    openConnection();
-    PlacesNames=new ArrayList<String>();
-    cityNames=new ArrayList<String>();
-    cityReport=new ArrayList<String>();
-    MapsNames=new ArrayList<String>();
-    image=null;
-    s= new String();                                    //
-    MapPlaces=new ArrayList<MapPlace>();  
-  }
-
-  public ArrayList<String> getPlacesNames() {
+public ArrayList<String> getPlacesNames() {
 	return PlacesNames;
 }
- 
+
 public void setPlacesNames(ArrayList<String> placesNames) {
 	PlacesNames = placesNames;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////Returns from server!!!!!!!!/////////////////////////////////////////////////////
 
 public void handleMessageFromServer(Object obj) 
   {
@@ -115,59 +126,72 @@ public void handleMessageFromServer(Object obj)
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	    		FileInputStream input = new FileInputStream(picfile);
-			    image= new Image(input);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-		     		e.printStackTrace();
-		    	}		
+			   FileInputStream input = new FileInputStream(picfile);
+			   image= new Image(input);
+		  } catch (FileNotFoundException e) {
+			  // TODO Auto-generated catch block
+			  e.printStackTrace();
+		  }		
 	}
-	else if(((ArrayList<MapPlace>)obj).get(0).getPlaceName().equals("returnedMapPlaces"))       //////////
+
+	else if(obj instanceof ArrayList)
 	{
-		System.out.println(((ArrayList<MapPlace>)obj).get(0).getPlaceName());
-		((ArrayList<MapPlace>)obj).remove(0);
-		setMapPlaces((ArrayList<MapPlace>)obj);
-		
-	}
-	else if(((ArrayList<String>)obj).get(0).equals("PlacesNames")) 
-	{
-		((ArrayList<String>)obj).remove(0);
-		setPlacesNames((ArrayList<String>)obj);
-	}
-	else if(((ArrayList<String>)obj).get(0).equals("CityNames"))
-	{
-		((ArrayList<String>)obj).remove(0);
-		setCityNames((ArrayList<String>)obj);
-		
-	}
-	else if(((ArrayList<String>)obj).get(0).equals("ReportNames"))
-	{
-		((ArrayList<String>)obj).remove(0);
-		setCityReport((ArrayList<String>)obj);
-	}
-	else if(((ArrayList<String>)obj).get(0).equals("MapsNames"))
-	{
-		((ArrayList<String>)obj).remove(0);
-		setMapsNames((ArrayList<String>)obj);
-	}
-	else if(((ArrayList<String>)obj).get(0).equals("LoginAnswer"))
-	{
-		((ArrayList<String>)obj).remove(0);
-		if(((ArrayList<String>)obj).get(0).equals("LogCustomer")) 
-			{
-			setLoginAnswer("Customer");
-			}
-		else if (((ArrayList<String>)obj).get(0).equals("LogEmployee")) 
+		if(((ArrayList<String>)obj).get(0) instanceof String )
 		{
-		setLoginAnswer("Employee");
+			if(((ArrayList<String>)obj).get(0).equals("PlacesNames")) 
+			{
+				((ArrayList<String>)obj).remove(0);
+				setPlacesNames((ArrayList<String>)obj);
+			}
+			else if(((ArrayList<String>)obj).get(0).equals("CityNames"))
+			{
+				((ArrayList<String>)obj).remove(0);
+				setCityNames((ArrayList<String>)obj);
+
+			}
+			else if(((ArrayList<String>)obj).get(0).equals("ReportNames"))
+			{
+				((ArrayList<String>)obj).remove(0);
+				setCityReport((ArrayList<String>)obj);
+			}
+			else if(((ArrayList<String>)obj).get(0).equals("MapsNames"))
+			{
+				((ArrayList<String>)obj).remove(0);
+				setMapsNames((ArrayList<String>)obj);
+			}
+			else if(((ArrayList<String>)obj).get(0).equals("LoginAnswer"))
+			{
+				((ArrayList<String>)obj).remove(0);
+				if(((ArrayList<String>)obj).get(0).equals("LogCustomer")) 
+				{
+					setLoginAnswer("Customer");
+				}
+				else if (((ArrayList<String>)obj).get(0).equals("LogEmployee")) 
+				{
+					setLoginAnswer("Employee");
+				}
+				else if(((ArrayList<String>)obj).get(0).equals("LogFailed"))
+					setLoginAnswer("Failed");
+			}
+
 		}
-		else if(((ArrayList<String>)obj).get(0).equals("LogFailed"))
-			setLoginAnswer("Failed");
+		else if(((ArrayList<MapPlace>)obj).get(0) instanceof MapPlace )
+		{
+			
+			if(((ArrayList<MapPlace>)obj).get(0).getPlaceName().equals("returnedMapPlaces"))       //////////
+			{
+				((ArrayList<MapPlace>)obj).remove(0);
+				setMapPlaces((ArrayList<MapPlace>)obj);
+
+			}
+		}
 	}
-	 
+
+	
+	
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////Sending To server ///////////////////////////////////////////////////////////////
   public void AddingNewData(Object obj) throws IOException
   {
 	  
@@ -175,21 +199,19 @@ public void handleMessageFromServer(Object obj)
 	   
   }
   
-///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+ 
   public void StringsToServer(ArrayList<String> strings) throws IOException
   {
+
 	  sendToServer(strings);
 	  
   }
   
-    public void MapToUpdate(MapPlace x) throws IOException         //////////
+    public void MapToUpdate(MapPlace x) throws IOException         
   {
-	  sendToServer(x);
+	  
+    	sendToServer(x);
   }
-  
-  //////////////////////////////////////////////////////////////////////////////////////////////////////
-  
-  
   
   public void handleMessageFromClientUI(String message)  
   {
@@ -204,7 +226,8 @@ public void handleMessageFromServer(Object obj)
     	}
     	else if(message.equals("GetCitiesForComboBox")) //incase the job is to get city names for combobox
         	{
-        		ArrayList<String> toGetCities=new ArrayList<String>();
+      	
+    		ArrayList<String> toGetCities=new ArrayList<String>();
         		toGetCities.add("GetCityNames"); //fill the first slot with the job name for the next method to work right
         		toGetCities.add("SELECT CityName FROM project.city;");//the query to be executed in the next method 
         		sendToServer(toGetCities);
@@ -229,4 +252,3 @@ public void handleMessageFromServer(Object obj)
     System.exit(0);
   }
 }
-
