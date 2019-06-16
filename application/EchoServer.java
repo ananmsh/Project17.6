@@ -58,6 +58,17 @@ public class EchoServer extends AbstractServer
 		{
 			AddPlace(obj);
 		}
+		else if(obj instanceof Purchase)
+	 {
+		 if(((Purchase) obj).getPurchaseType().equals("OneTime"))
+		 {
+		     AddOneTimePurchase(obj);
+		 }
+		 else if(((Purchase) obj).getPurchaseType().equals("subscription"))
+		 {
+			 AddSubscription(obj);
+		 }
+	 }
 		else if(obj instanceof Tour)
 		{
 			AddTour(obj);
@@ -542,7 +553,34 @@ public class EchoServer extends AbstractServer
 		}//update the version of the selected city accordingly
 
 	}
-
+	  private void AddSubscription(Object obj) {
+		PreparedStatement stmt2;
+		try {
+			stmt2 = con1.prepareStatement("INSERT INTO project.customer_subscription VALUES (?,?,?,?)");
+		  stmt2.setString(2, ((Purchase)obj).getCityname());
+		  stmt2.setString(1, ((Purchase)obj).getCustomerid());
+		  stmt2.setString(3, ((Purchase)obj).getDateStart().toString());
+		  stmt2.setString(4, ((Purchase)obj).getDateEnd().toString());
+		  stmt2.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//update the version of the selected city accordingly	
+}
+private void AddOneTimePurchase(Object obj) {
+	PreparedStatement stmt2;
+	try {
+		stmt2 = con1.prepareStatement("INSERT INTO project.customer_onetimebuy VALUES (?,?,?)");
+	  stmt2.setString(2, ((Purchase)obj).getCityname());
+	  stmt2.setString(1, ((Purchase)obj).getCustomerid());
+	  stmt2.setString(3, ((Purchase)obj).getOneTimeDate().toString());
+	  stmt2.executeUpdate();
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}//update the version of the selected city accordingly	
+	
+}
 	private void AddCity(Object obj) {
 
 
